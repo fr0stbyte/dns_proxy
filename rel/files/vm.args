@@ -1,9 +1,9 @@
 
 ## Name of the node
--name dns_cache_and_forward@127.0.0.1
+-name dns_proxy@127.0.0.1
 
 ## Cookie for distributed erlang
--setcookie dns_cache_and_forward
+-setcookie dns_proxy
 
 ## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
 ## (Disabled by default..use with caution!)

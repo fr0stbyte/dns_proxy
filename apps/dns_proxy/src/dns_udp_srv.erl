@@ -1,3 +1,19 @@
+%%---------------------------------------------------------------------
+%%   Copyright [2011] [Radu Brumariu (radubrumariu@gmail.com)]
+%%
+%%   Licensed under the Apache License, Version 2.0 (the "License");
+%%   you may not use this file except in compliance with the License.
+%%   You may obtain a copy of the License at
+%%
+%%     http://www.apache.org/licenses/LICENSE-2.0
+%%
+%%   Unless required by applicable law or agreed to in writing, software
+%%   distributed under the License is distributed on an "AS IS" BASIS,
+%%   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%   See the License for the specific language governing permissions and
+%%   limitations under the License.
+%%---------------------------------------------------------------------
+
 -module(dns_udp_srv).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
@@ -34,7 +50,7 @@ init([Port]) ->
     Opts = [binary,{active,false}],
     case gen_udp:open(Port, Opts) of
 	{ok, LSocket} -> 
-	    error_logger:error_msg("[~p:~p]Started server socket : ~p~n",[?MODULE,dns_utils:get_timestamp_micro(),LSocket]),
+%%	    error_logger:error_msg("[~p:~p]Started server socket : ~p~n",[?MODULE,dns_utils:get_timestamp_micro(),LSocket]),
 	    {ok,accept(#state{id=1,socket = LSocket})};
 	{error, Reason} ->
 	    {stop,Reason}
@@ -44,7 +60,7 @@ handle_call(_Request, _From, State) ->
   {noreply, ok, State}.
 
 handle_cast({"accepted",NewState}, _State) ->
-    error_logger:error_msg("[~p:~p]Handle cast - accepted state~n",[?MODULE,dns_utils:get_timestamp_micro()]),
+%%    error_logger:error_msg("[~p:~p]Handle cast - accepted state~n",[?MODULE,dns_utils:get_timestamp_micro()]),
     {noreply, accept(NewState)};
 handle_cast(_Msg, State) ->
     {noreply, State}.
@@ -66,7 +82,7 @@ code_change(_OldVsn, State, _Extra) ->
 %% ------------------------------------------------------------------
 
 accept(State) ->
-    error_logger:error_msg("[~p:~p] In accept state~n",[?MODULE,dns_utils:get_timestamp_micro()]),
+%%    error_logger:error_msg("[~p:~p] In accept state~n",[?MODULE,dns_utils:get_timestamp_micro()]),
     proc_lib:spawn_link(?MODULE, accept_loop, [{self(),State}]),
     State.
 

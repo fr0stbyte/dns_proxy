@@ -1,3 +1,19 @@
+%%---------------------------------------------------------------------
+%%   Copyright [2011] [Radu Brumariu (radubrumariu@gmail.com)]
+%%
+%%   Licensed under the Apache License, Version 2.0 (the "License");
+%%   you may not use this file except in compliance with the License.
+%%   You may obtain a copy of the License at
+%%
+%%     http://www.apache.org/licenses/LICENSE-2.0
+%%
+%%   Unless required by applicable law or agreed to in writing, software
+%%   distributed under the License is distributed on an "AS IS" BASIS,
+%%   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%%   See the License for the specific language governing permissions and
+%%   limitations under the License.
+%%---------------------------------------------------------------------
+
 -module(dns_mnesia_srv).
 -behaviour(gen_server).
 -define(SERVER, ?MODULE).
@@ -45,7 +61,6 @@ handle_call({lookup,Query}, _From, State) ->
   {stop,normal, Result, State}.
 
 handle_cast({update, Packet}, State) ->
-  error_logger:error_msg("Packet to update/delete : ~p~n",[Packet]),
   delete(Packet),
   update(Packet),
   {stop,normal, State}.
@@ -114,9 +129,7 @@ read_records(A) ->
 			Guard = {'>','$1',TS-D},
 			Result = '$_',
 			R = mnesia:dirty_select(?DNS_RR_TABLE,[{MatchHead,[Guard],[Result]}]),
-
 			Res = validate_responses(R,#dns_query{domain=element(1,X),type=element(2,X),class=element(3,X)},TS),
-%%			error_logger:error_msg("[~p:~p]Results = ~p~n",[?MODULE,dns_utils:get_timestamp(),Res]),
 			[Res|Acc]
 		end,
 		[],
@@ -127,20 +140,11 @@ validate_responses([],Q,_TS)->
     gen_server:call(WRef,{lookup,Q});
 validate_responses(R,_Q,TS) ->
     [ X#dns_rr{ttl=abs(TS-X#dns_rr.ttl)} || X <- R].
-%%    lists:map(fun(X)->
-%%		      D = TS-X#dns_rr.ttl,
-%%		      X#dns_rr{ttl=abs(D)}
-%%	      end,
-%%	      R).
     
 
 lookup_response([]) ->
     [];
 lookup_response(Queries) ->
-    lists:foldr(fun(X,Ac) ->
-			[ #dns_response{ar=lists:flatten(read_records(X#dns_queries.ar)),
-			  ns = lists:flatten(read_records(X#dns_queries.ns)),
-			  an = lists:flatten(read_records(X#dns_queries.an))}
-			 |Ac] end,
-		[],
-		Queries).
+    [ #dns_response{ar=lists:flatten(read_records(X#dns_queries.ar)),
+		    ns = lists:flatten(read_records(X#dns_queries.ns)),
+		    an = lists:flatten(read_records(X#dns_queries.an))} || X <- Queries ].
