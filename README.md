@@ -12,7 +12,7 @@ To build dns_proxy rebar is required. If you don't already have it, you can get 
 
 Clone the git repository :
       
-      $ git clone git://github.com/radubrumariu/dns_proxy.git
+      $ git clone git://github.com/fr0stbyte/dns_proxy.git
 
 #### Building dns_proxy
 
